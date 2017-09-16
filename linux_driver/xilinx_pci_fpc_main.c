@@ -42,11 +42,11 @@ static int debug = 1;      /* 1 normal messages, 0 quiet .. 7 verbose. */
 
 #include <asm/io.h>
 #include <asm/irq.h>
-#include <asm/system.h>
+#include <asm/switch_to.h>
 #include <asm/uaccess.h>
 
 /* These identify the driver base version and may not be removed. */
-static const char version[] __devinitconst =
+static const char version[] __initconst =
   KERN_INFO DRV_NAME ".c:v" DRV_VERSION " " DRV_RELDATE
   " Eldridge Mount (emount@rochester.rr.com)\n";
 
@@ -78,7 +78,7 @@ MODULE_PARM_DESC(debug, "debug level (1-2)");
 static struct {
   char *name;
   int flags;
-} pci_clone_list[] __devinitdata = {
+} pci_clone_list[] __initdata = {
   {"Xilinx_DemoBoard", 0},
   {NULL, }
 };
@@ -274,7 +274,7 @@ static irqreturn_t xilinx_pci_fpc_isr(int irq, void *dev_id) {
 }
 
 /* Probe function */
-static int __devinit fpc_pci_init_one(struct pci_dev *pdev, const struct pci_device_id *ent) {
+static int __init fpc_pci_init_one(struct pci_dev *pdev, const struct pci_device_id *ent) {
 #ifndef MODULE
   static int printed_version  = 0;
 #endif
@@ -421,7 +421,7 @@ static int fpc_pci_close(struct net_device *dev)
 #endif // NOTYET
 
 /* Release function */
-static void __devexit fpc_pci_remove_one (struct pci_dev *pdev)
+static void __exit fpc_pci_remove_one (struct pci_dev *pdev)
 {
   struct pci_fpc_device *fpc_dev = pci_get_drvdata(pdev);
   uint32_t dev_index;
@@ -486,7 +486,7 @@ static int fpc_pci_resume (struct pci_dev *pdev)
 static struct pci_driver xilinx_fpc_driver = {
   .name     = DRV_NAME,
   .probe    = fpc_pci_init_one,
-  .remove   = __devexit_p(fpc_pci_remove_one),
+  .remove   = __exit_p(fpc_pci_remove_one),
   .id_table = fpc_pci_tbl,
 #ifdef CONFIG_PM
   .suspend  = fpc_pci_suspend,
